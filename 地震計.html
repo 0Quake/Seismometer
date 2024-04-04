@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地震計</title>
+    <style>
+        html,
+        body {
+            width: 100vw;
+            padding: 0;
+            margin: 0;
+            background: #222;
+            color: #fff;
+            color-scheme: dark;
+        }
+
+        #canvas {
+            width: 100vw;
+            height: 50vh;
+        }
+
+        main {
+            padding: 10px;
+        }
+
+        #progress {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background-color: #aaa;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        #progress::-webkit-progress-bar {
+            background-color: #ccc;
+        }
+
+        #progress::-webkit-progress-value {
+            background-color: #888;
+        }
+
+        #progress::-moz-progress-bar {
+            background-color: #888;
+        }
+
+        .dataItem {
+            display: inline-block;
+            border-radius: 8px;
+            margin: 3px;
+            text-align: center;
+            min-width: 180px;
+        }
+
+        #detail_wrap {
+            margin-top: 20px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        #detail {
+            display: inline-block;
+            border-radius: 8px;
+            margin: 3px;
+            text-align: left;
+            padding: 20px;
+            background: #444;
+            min-width: 60vw;
+        }
+
+        #int_c {
+            padding: 3px 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #int_c * {
+            color: inherit;
+        }
+
+        #int {
+            display: inline-block;
+            font-size: 40px;
+        }
+
+        #int_d {
+            display: inline-block;
+            font-size: 18px;
+            opacity: 0.8;
+        }
+
+        #intCover {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ccc;
+            color: #333;
+        }
+
+        #infoWrap {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        #pga_c,
+        #pgv_c,
+        #pgd_c {
+            padding: 3px 15px;
+            background: #444;
+            flex-shrink: 2;
+        }
+
+        #pga,
+        #maxpga,
+        #maxpgv,
+        #maxpgd {
+            display: inline-block;
+        }
+
+        #maxpga_wrap,
+        #maxpgv_wrap,
+        #maxpgd_wrap {
+            color: #ccc;
+        }
+
+        #BtnWrap {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #BtnWrap button {
+            font-size: 18px;
+            padding: 3px 8px;
+        }
+
+        #houiView {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            margin: 20px;
+        }
+
+        #PGAPGVInt {
+            display: inline-block;
+            border-radius: 3px;
+            padding: 0 3px;
+        }
+
+        #onepoint_d {
+            background: #222;
+            outline: none;
+            border: none;
+            box-shadow: 3px 3px 5px #000;
+            border-radius: 8px;
+        }
+
+        dialog::backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        #infoWrap {
+            display: flex;
+        }
+
+        .infoItem {
+            background: #333;
+            border-radius: 8px;
+            margin: 4px;
+            text-align: center;
+            padding: 15px;
+        }
+
+        .GUI_Wrap {
+            position: relative;
+            width: 70px;
+            height: 70px;
+            overflow: hidden;
+            border-radius: 8px;
+            font-size: 60px;
+            line-height: 70px;
+            text-align: center;
+            margin: 0 auto;
+            color: #777;
+        }
+
+        .success {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: #5ad14a;
+            color: #000;
+            text-align: center;
+            line-height: 70px;
+            font-size: 30px;
+        }
+
+        #Suijunpoint {
+            position: absolute;
+            left: 30px;
+            top: 30px;
+            width: 10px;
+            height: 10px;
+            border-radius: 5px;
+            background: #227cd6;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+
+    <main>
+        <div id="infoWrap">
+            <div id="int_c" class="dataItem">
+                震度
+                <div id="int">-</div>
+                <div id="int_d">(0.0)</div>
+                <div id="intCover">震度　お待ちください...
+                    <progress id="progress" max="1" value="0"></progress>
+                </div>
+            </div>
+            <div id="pga_c" class="dataItem">
+                合成加速度 <div id="pga">0.00</div>gal
+                <div id="maxpga_wrap">秒間最大<div id="maxpga">0.00</div>gal</div>
+            </div>
+            <div id="pgv_c" class="dataItem">
+                速度
+                <div id="maxpgv_wrap">秒間最大 <div id="maxpgv">0.00</div>cm/s</div>
+            </div>
+            <div id="pgd_c" class="dataItem">
+                変位
+                <div id="maxpgd_wrap">秒間最大 <div id="maxpgd">0.00</div>cm</div>
+            </div>
+        </div>
+        <div id="detail_wrap">
+            <div id="detail">
+                <div>推定震度１ : <span id="PGAPGVInt">0</span> ±0.2</div>
+                <div>サンプリング周波数 : <span id="sampleRate">0</span>Hz</div>
+
+                <div><button id="onepoint">ワンポイントアドバイス</button></div>
+
+                <hr style="border-color:#999;margin:25px 0;">
+                <details>
+                    <summary style="color:#CCC;font-size:14px">参考文献など </summary>
+                    <ul>
+                        <li>藤本一雄・翠川三郎 (2005) : 近年の強震記録に基づく地震動強さ指標による計測震度推定法</li>
+                        <li>【ネット記事】<a href="https://qiita.com/soshi1822/items/6ae0c2d14a72478c79a0">加速度から計測震度を計算してみる</li>
+                        <li>【ネット記事】<a href="https://qiita.com/bellbind/items/ba7aa07f6c915d400000#7-javascript%E3%81%AB%E3%82%88%E3%82%8B%E3%83%AB%E3%83%BC%E3%83%97%E7%89%88fft%E5%AE%9F%E8%A3%85%E3%82%B3%E3%83%BC%E3%83%89">高速フーリエ変換FFTを理解する</a></li>
+                    </ul>
+                </details>
+                <div style="color:#CCC;font-size:14px">※気象庁検定を受けていない為、表示する値は全て震度相当値となります</div>
+            </div>
+        </div>
+    </main>
+
+    <dialog id="onepoint_d">
+        <div id="infoWrap">
+            <div class="infoItem">
+                <div class="GUI_Wrap">
+                    <svg id="Nicon" xmlns="http://www.w3.org/2000/svg" height="40" viewBox="0 -960 960 960" width="40" fill="#FFF">
+                        <path d="m200-120-40-40 320-720 320 720-40 40-280-120-280 120Z" />
+                    </svg>
+                    <div id="NiconSuccess" class="success">✅</div>
+                </div>
+                <div>端末を<br>北に向ける</div>
+            </div>
+            <div class="infoItem">
+                <div class="GUI_Wrap">
+                    ＋
+                    <div id="Suijunpoint"></div>
+                    <div id="SuijunSuccess" class="success">✅</div>
+                </div>
+                <div>安定した<br>水平面に置く</div>
+            </div>
+        </div>
+        <button id="onepoint_c">閉じる</button>
+    </dialog>
+    <script>
+        const dpr = window.devicePixelRatio || 1;
+        const canvas = document.getElementById("canvas");
+        const c = canvas.getContext("2d");
+        const w = (canvas.width = (window.innerWidth / 4) * dpr);
+        const h = (canvas.height = (window.innerHeight / 4) * dpr);
+
+        let ax, ay, az;
+
+        let buf = [];
+        const ofsY = [1 / 6, 0.5, 5 / 6];
+        const scaleY = [0.01 * dpr, 0.01 * dpr, 0.01 * dpr];
+        const penColor = ["#cf4444", "#44cf49", "#4475cf"];
+        const maxN = w;
+
+        window.addEventListener("load", init);
+        function init() {
+            timerFunc();
+            setInterval(function () {
+                requestAnimationFrame(timerFunc);
+            }, 100);
+            setInterval(calcshindo, 1000);
+        }
+
+        function redraw() {
+            c.fillStyle = "#333";
+            c.fillRect(0, 0, w, h);
+
+            c.strokeStyle = "#666";
+            c.lineWidth = 1;
+            for (i = 0; i < 3; i++) {
+                c.beginPath();
+                c.moveTo(0, ofsY[i] * h);
+                c.lineTo(canvas.width, ofsY[i] * h);
+                c.stroke();
+            }
+
+            if (buf.length >= 2) {
+                for (let seq = 0; seq < 3; seq++) {
+                    c.strokeStyle = penColor[seq];
+                    c.beginPath();
+                    c.lineWidth = 1;
+                    c.lineCap = "round";
+                    c.lineJoin = "round";
+                    let y0 = ofsY[seq] * h;
+                    let yA = scaleY[seq] * h;
+
+                    c.moveTo(0, y0 - yA * buf[0][seq]);
+                    for (let i = 0; i < buf.length; i++) {
+                        c.lineTo(i, y0 - yA * buf[i][seq]);
+                    }
+                    c.stroke();
+                }
+            }
+        }
+
+        var interval = 1;
+        window.addEventListener("devicemotion", handleDeviceMotion);
+        function handleDeviceMotion(event) {
+            interval = event.interval;
+            document.getElementById("sampleRate").innerText = Math.floor(1000 / interval);
+            let t1 = event.acceleration.y;
+            let t2 = event.acceleration.x;
+            let t3 = event.acceleration.z;
+            if (t1 !== null) {
+                ax = t1;
+                ay = t2;
+                az = t3;
+
+                gals[0].push(ax);
+                gals[1].push(ay);
+                gals[2].push(az);
+            }
+        }
+
+        function timerFunc() {
+            buf.push([ax, ay, az]);
+            if (buf.length > maxN) {
+                buf.shift();
+            } // delete index 0
+            redraw();
+
+            //合成加速度
+            if (ax) {
+                document.getElementById("pga").innerText = Math.sqrt(
+                    ax ** 2 + ay ** 2 + az ** 2
+                ).toFixed(2);
+            }
+        }
+
+        var gals = [[], [], []];
+        function calcshindo() {
+            var filterCoefficient = 0.9;
+            var lowpassValue = 0;
+            var highpassValue = 0;
+            var timeSpan = 0.1;
+            var oldAccel = 0;
+            var speed = 0;
+            var oldSpeed = 0;
+            var difference = 0;
+            var maxSpeed = 0;
+            var maxPGA = 0;
+            var maxPGD = 0;
+
+            gal = gals[0].map(function (elm, index) {
+                return Math.sqrt(
+                    gals[0][index] ** 2 + gals[1][index] ** 2 + gals[2][index] ** 2
+                );
+            });
+            var gal_tmp = gal.slice(gal.length - Math.floor(1000 / interval));
+            for (i = 0; i < Math.floor(1000 / interval); i++) {
+                lowpassValue =
+                    lowpassValue * filterCoefficient + gal_tmp[i] * (1 - filterCoefficient);
+                highpassValue = gal_tmp[i] - lowpassValue;
+
+                speed = ((highpassValue + oldAccel) * timeSpan) / 2 + speed;
+                oldAccel = highpassValue;
+
+                difference = ((speed + oldSpeed) * timeSpan) / 2 + difference;
+                oldSpeed = speed;
+                if (maxPGA < gal_tmp[i]) maxPGA = gal_tmp[i];
+                if (maxSpeed < speed) maxSpeed = speed;
+                if (maxPGD < difference) maxPGD = difference;
+            }
+
+            document.getElementById("maxpga").innerText = maxPGA.toFixed(2);
+            document.getElementById("maxpgv").innerText = maxSpeed.toFixed(2);
+            document.getElementById("maxpgd").innerText = maxPGD.toFixed(2);
+            var estInt = 1.291 + 1.017 * Math.log10(maxPGA * maxSpeed);
+            estInt = Math.max(0, estInt);
+            estInt = Math.min(7, estInt);
+            document.getElementById("PGAPGVInt").style.background = shindoConvert(
+                estInt,
+                2
+            )[0];
+            document.getElementById("PGAPGVInt").style.color = shindoConvert(
+                estInt,
+                2
+            )[1];
+            document.getElementById("PGAPGVInt").innerText = estInt.toFixed(2);
+
+            document.getElementById("progress").value =
+                (gals[0].length * interval) / 60000;
+            if (gals[0].length * interval > 60000)
+                document.getElementById("intCover").style.display = "none";
+            fftGals = gals.map(function (gal) {
+                gal = gal.slice(Math.floor(gal.length - 60000 / interval));
+                return fft(arrayPadding(gal).map((r) => [r, 0]));
+            });
+            const dt = interval / 1000;
+
+            const NF = fftGals[0].length;
+            const NF2 = NF / 2;
+
+            for (let i = 1; i <= NF2; i++) {
+                const frq = i / (NF * dt);
+                const x = frq / 10;
+                const fc = Math.sqrt(1 / frq);
+                const fh =
+                    1 /
+                    Math.sqrt(
+                        1 +
+                        0.694 * x ** 2 +
+                        0.241 * x ** 4 +
+                        0.0557 * x ** 6 +
+                        0.009664 * x ** 8 +
+                        0.00134 * x ** 10 +
+                        0.000155 * x ** 12
+                    );
+                const fl = (1 - Math.exp((-(frq / 0.5)) ** 3)) ** 0.5;
+                const fa = fc * fh * fl;
+
+                for (let lk = 0; lk < fftGals.length; lk++) {
+                    const fs = [fftGals[lk][i][0] * fa, fftGals[lk][i][1] * fa];
+                    fftGals[lk][i] = fs;
+                    fftGals[lk][NF - i] = [fs[0], -fs[1]];
+                }
+            }
+            const filterGals = fftGals.map((fftGal) => ifft(fftGal));
+            const lenGals = [];
+
+            filterGals.forEach((gal, i) => {
+                gal.forEach(([gas], t) => {
+                    (lenGals[t] || (lenGals[t] = [])).push(gas);
+                });
+            });
+
+            const syntheticGal = lenGals.map(([s1, s2, s3]) =>
+                Math.sqrt(s1 ** 2 + s2 ** 2 + s3 ** 2)
+            );
+
+            syntheticGal.sort((a, b) => b - a);
+            const top03 = Math.floor(0.3 / dt) - 1;
+            const int = 2 * (Math.log(syntheticGal[top03]) / Math.LN10) + 0.94;
+            var kInt = (Math.floor(Math.round(int * 100) / 10) / 10).toFixed(1);
+
+            document.getElementById("int").innerText = shindoConvert(kInt, 1);
+            if (!kInt || isNaN(kInt)) kInt = "-";
+            else if (kInt == -Infinity) kInt = "-∞";
+            document.getElementById("int_d").innerText = "(" + kInt + ")";
+
+            document.getElementById("int_c").style.background = shindoConvert(kInt, 2)[0];
+            document.getElementById("int_c").style.color = shindoConvert(kInt, 2)[1];
+        }
+
+        function arrayPadding(arr) {
+            let dips = 2;
+            while (dips <= arr.length) {
+                dips *= 2;
+            }
+            return arr.concat(new Array(dips - arr.length).fill(0));
+        }
+
+        function revBit(k, n) {
+            let r = 0;
+            for (let i = 0; i < k; i++) r = (r << 1) | ((n >>> i) & 1);
+            return r;
+        }
+        function expi(theta) {
+            return [Math.cos(theta), Math.sin(theta)];
+        }
+        function iadd([ax, ay], [bx, by]) {
+            return [ax + bx, ay + by];
+        }
+        function isub([ax, ay], [bx, by]) {
+            return [ax - bx, ay - by];
+        }
+        function imul([ax, ay], [bx, by]) {
+            return [ax * bx - ay * by, ax * by + ay * bx];
+        }
+        function isum(cs) {
+            return cs.reduce((s, c) => iadd(s, c), [0, 0]);
+        }
+        function fftin1(c, T, N) {
+            const k = Math.log2(N);
+            const rec = c.map((_, i) => c[revBit(k, i)]);
+            for (let Nh = 1; Nh < N; Nh *= 2) {
+                T /= 2;
+                for (let s = 0; s < N; s += Nh * 2) {
+                    for (let i = 0; i < Nh; i++) {
+                        const l = rec[s + i],
+                            re = imul(rec[s + i + Nh], expi(T * i));
+                        [rec[s + i], rec[s + i + Nh]] = [iadd(l, re), isub(l, re)];
+                    }
+                }
+            }
+            return rec;
+        }
+
+        function fft(f) {
+            const N = f.length,
+                T = -2 * Math.PI;
+            return fftin1(f, T, N);
+        }
+        function ifft(F) {
+            const N = F.length,
+                T = 2 * Math.PI;
+            return fftin1(F, T, N).map(([r, i]) => [r / N, i / N]);
+        }
+
+        function shindoConvert(str, responseType) {
+            var ShindoTmp;
+            if (str === null || str === undefined) ShindoTmp = 11;
+            else if (isNaN(str)) {
+                str = String(str)
+                    .replace(/[０-９]/g, function (s) {
+                        return String.fromCharCode(s.charCodeAt(0) - 0xfee0);
+                    })
+                    .replaceAll("＋", "+")
+                    .replaceAll("－", "-")
+                    .replaceAll("強", "+")
+                    .replaceAll("弱", "-")
+                    .replace(/\s+/g, "");
+                switch (str) {
+                    case "1":
+                    case "10":
+                        ShindoTmp = 1;
+                        break;
+                    case "2":
+                    case "20":
+                        ShindoTmp = 2;
+                        break;
+                    case "3":
+                    case "30":
+                        ShindoTmp = 3;
+                        break;
+                    case "4":
+                    case "40":
+                        ShindoTmp = 4;
+                        break;
+                    case "5-":
+                    case "45":
+                        ShindoTmp = 5;
+                        break;
+                    case "5+":
+                    case "50":
+                        ShindoTmp = 6;
+                        break;
+                    case "6-":
+                    case "55":
+                        ShindoTmp = 7;
+                        break;
+                    case "6+":
+                    case "60":
+                        ShindoTmp = 8;
+                        break;
+                    case "7":
+                    case "70":
+                        ShindoTmp = 9;
+                        break;
+                    case "震度5-以上未入電":
+                    case "5+?":
+                        ShindoTmp = 10;
+                        break;
+                    case "-1":
+                    case "?":
+                    case "不明":
+                    default:
+                        ShindoTmp = 11;
+                }
+            } else {
+                if (str < 0.5) ShindoTmp = 0;
+                else if (str < 1.5) ShindoTmp = 1;
+                else if (str < 2.5) ShindoTmp = 2;
+                else if (str < 3.5) ShindoTmp = 3;
+                else if (str < 4.5) ShindoTmp = 4;
+                else if (str < 5) ShindoTmp = 5;
+                else if (str < 5.5) ShindoTmp = 6;
+                else if (str < 6) ShindoTmp = 7;
+                else if (str < 6.5) ShindoTmp = 8;
+                else if (6.5 <= str) ShindoTmp = 9;
+                else ShindoTmp = 11;
+            }
+            switch (responseType) {
+                case 1:
+                    var ConvTable = [
+                        "0",
+                        "1",
+                        "2",
+                        "3",
+                        "4",
+                        "5弱",
+                        "5強",
+                        "6弱",
+                        "6強",
+                        "7",
+                        "５弱以上未入電",
+                        "?"
+                    ];
+                    break;
+                case 2:
+                    var ConvTable = [
+                        ["rgb(80, 86, 102)", "rgb(204, 204, 204)"],
+                        ["rgb(134, 168, 198)", "rgb(51, 51, 51)"],
+                        ["rgb(56, 120, 193)", "rgb(255, 255, 255)"],
+                        ["rgb(80, 186, 84)", "rgb(34, 34, 34)"],
+                        ["rgb(204, 209, 74)", "rgb(34, 34, 34)"],
+                        ["rgb(231, 150, 21)", "rgb(0, 0, 0)"],
+                        ["rgb(255, 91, 22)", "rgb(0, 0, 0)"],
+                        ["rgb(237, 0, 0)", "rgb(255, 255, 255)"],
+                        ["rgb(128, 9, 9)", "rgb(255, 255, 255)"],
+                        ["rgb(196, 0, 222)", "rgb(255, 255, 255)"],
+                        ["rgb(231, 150, 21)", "rgb(0, 0, 0)"],
+                        ["rgb(191, 191, 191)", "rgb(68, 68, 68)"]
+                    ];
+                    break;
+                case 3:
+                    var ConvTable = [
+                        null,
+                        "1",
+                        "2",
+                        "3",
+                        "4",
+                        "5m",
+                        "5p",
+                        "6m",
+                        "6p",
+                        "7",
+                        "5p?",
+                        null
+                    ];
+                    break;
+                case 4:
+                    var ConvTable = [0, 1, 2, 3, 4, 4.5, 5, 5.5, 6, 7, 4.5, null];
+                    break;
+                case 5:
+                    var ConvTable = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 4.5, 0];
+                    break;
+                case 0:
+                default:
+                    var ConvTable = [
+                        "0",
+                        "1",
+                        "2",
+                        "3",
+                        "4",
+                        "5-",
+                        "5+",
+                        "6-",
+                        "6+",
+                        "7",
+                        "未",
+                        "?"
+                    ];
+                    break;
+            }
+            return ConvTable[ShindoTmp];
+        }
+
+        document.getElementById("onepoint").addEventListener("click", function () {
+            document.getElementById("onepoint_d").showModal();
+        });
+        document.getElementById("onepoint_c").addEventListener("click", function () {
+            document.getElementById("onepoint_d").close();
+        });
+
+        window.addEventListener("deviceorientation", handleOrientation, true);
+        function handleOrientation(event) {
+            if (event.absolute) {
+                const alpha = event.alpha;
+                document.getElementById("Nicon").style.transform =
+                    "rotate(" + alpha + "deg)";
+                document.getElementById("NiconSuccess").style.display =
+                    alpha > 355 || alpha < 5 ? "block" : "none";
+            }
+            document.getElementById("Suijunpoint").style.transform =
+                "translate(" +
+                Math.max(Math.min(0 - event.gamma * 3, 35), -35) +
+                "px, " +
+                Math.max(Math.min(0 - event.beta * 3, 35), -35) +
+                "px)";
+            document.getElementById("SuijunSuccess").style.display =
+                Math.abs(event.gamma) < 2 && Math.abs(event.beta) < 2 ? "block" : "none";
+        }
+    </script>
+</body>
+
+</html>
