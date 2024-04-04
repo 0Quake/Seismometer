@@ -5,7 +5,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>地震計</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@800&display=swap" rel="stylesheet">
+
     <style>
+        header {
+            text-align: center;
+        }
+
+        header img {
+            width: 70px;
+            vertical-align: middle;
+            margin: 0 20px;
+        }
+
+        h1 span {
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         html,
         body {
             width: 100vw;
@@ -14,6 +38,11 @@
             background: #222;
             color: #fff;
             color-scheme: dark;
+            font-family: "BIZ UDPGothic", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+            line-height: 1.5;
+            overflow-x: hidden;
         }
 
         #canvas {
@@ -61,16 +90,17 @@
             margin-top: 20px;
             text-align: center;
             line-height: 1.5;
+            min-width: 60vw;
+            max-width: calc(100% - 20px);
+
         }
 
         #detail {
             display: inline-block;
             border-radius: 8px;
-            margin: 3px;
             text-align: left;
             padding: 20px;
             background: #444;
-            min-width: 60vw;
         }
 
         #int_c {
@@ -108,6 +138,7 @@
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
+            max-width: calc(100% - 20px);
         }
 
         #pga_c,
@@ -152,6 +183,9 @@
             display: inline-block;
             border-radius: 3px;
             padding: 0 3px;
+            font-family: "M PLUS 1p", sans-serif;
+            font-weight: 800;
+            font-style: normal;
         }
 
         #onepoint_d {
@@ -212,10 +246,19 @@
             border-radius: 5px;
             background: #227cd6;
         }
+
+        footer {
+            background: #333;
+            padding: 20px 10px;
+            text-align: center;
+        }
     </style>
 </head>
 
 <body>
+    <header>
+        <h1><img src="./logo.svg"><span>Zero Quake</span> <span>簡易地震計</span></h1>
+    </header>
     <canvas id="canvas"></canvas>
 
     <main>
@@ -243,8 +286,8 @@
         </div>
         <div id="detail_wrap">
             <div id="detail">
-                <div>推定震度１ : <span id="PGAPGVInt">0</span> ±0.2</div>
-                <div>サンプリング周波数 : <span id="sampleRate">0</span>Hz</div>
+                <div>推定震度１ : <span id="PGAPGVInt">0.00</span> ±0.2</div>
+                <div>サンプリング周波数 : <span id="sampleRate">-</span>Hz</div>
 
                 <div><button id="onepoint">ワンポイントアドバイス</button></div>
 
@@ -284,6 +327,10 @@
         </div>
         <button id="onepoint_c">閉じる</button>
     </dialog>
+
+    <footer>
+        <small>&copy;2024 Benidate</small>
+    </footer>
     <script>
         const dpr = window.devicePixelRatio || 1;
         const canvas = document.getElementById("canvas");
