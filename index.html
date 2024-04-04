@@ -417,7 +417,7 @@
             redraw();
 
             //合成加速度
-            if (ax) {
+            if (ax !== null) {
                 document.getElementById("pga").innerText = Math.sqrt(
                     ax ** 2 + ay ** 2 + az ** 2
                 ).toFixed(2);
