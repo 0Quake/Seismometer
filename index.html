@@ -9,7 +9,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@800&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
 
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then(async (registration) => {
+                console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            }).catch((err) => {
+                console.log('ServiceWorker registration failed: ', err);
+            });
+        }
+    </script>
+    
     <style>
         header {
             text-align: center;
