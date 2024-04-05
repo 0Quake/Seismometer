@@ -5,7 +5,7 @@
     "start_url": "https://0quake.github.io/Seismometer/index.html",
     "icons": [
         {
-            "src": "https://0quake.github.io/Seismometer/192.png",
+            "src": "https://0quake.github.io/Seismometer/img/192.png",
             "sizes": "192x192",
             "type": "image/png"
         }
