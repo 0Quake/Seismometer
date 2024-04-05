@@ -3,6 +3,9 @@
     "name": "Zero Quake 簡易地震計",
     "display": "standalone",
     "start_url": "https://0quake.github.io/Seismometer/index.html",
+    "scope": "https://0quake.github.io/Seismometer/",
+    "background_color": "#222",
+    "theme_color": "#222",
     "icons": [
         {
             "src": "https://0quake.github.io/Seismometer/img/192.png",
