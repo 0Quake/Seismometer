@@ -1,4 +1,7 @@
 # ZeroQake 簡易地震計 on the Web
+
+![ss2](https://github.com/0Quake/Seismometer/assets/93989835/91d51b63-8a93-447b-9baa-b02c63f7b54e)
+
 ### スマホで簡単地震観測
 正確な震度相当値に加え、加速度、速度、変位などの代表値や、迅速に揺れが反映される震度概算値、加速度波形を表示できます。
 
