@@ -2,16 +2,16 @@
     "short_name": "簡易地震計",
     "name": "Zero Quake 簡易地震計",
     "display": "standalone",
-    "start_url": "index.html",
+    "start_url": "https://0quake.github.io/Seismometer/index.html",
     "icons": [
         {
-            "src": "192.png",
+            "src": "https://0quake.github.io/Seismometer/192.png",
             "sizes": "192x192",
             "type": "image/png"
         }
     ],
     "screenshots": [{
-        "src": "img/ss1.png",
+        "src": "https://0quake.github.io/Seismometer/img/ss1.png",
         "sizes": "320x640",
         "type": "image/gif"
     }],
