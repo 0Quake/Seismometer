@@ -587,12 +587,12 @@
             var maxPGA = 0;
             var maxPGD = 0;
 
-            gal_tmp = [];
-            for (let i = 0; i < gals[0].length; i++) {
-                gal_tmp.push(Math.sqrt(
-                    gals[0][i] ** 2 + gals[1][i] ** 2 + gals[2][i] ** 2
-                ))
-            }
+            var gal_tmp = gals[0].map(function (elm, index) {
+                return Math.sqrt(
+                    gals[0][index] ** 2 + gals[1][index] ** 2 + gals[2][index] ** 2
+                );
+            });
+            gal_tmp = gal_tmp.slice(gal_tmp.length - Math.floor(1000 / interval));
 
             for (i = 0; i < Math.floor(1000 / interval); i++) {
                 lowpassValue =
