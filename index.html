@@ -571,10 +571,6 @@
 
         var gals = [[], [], []];
         function calcshindo() {
-            gals[0] = gals[0].slice(gals[0].length - Math.floor(60000 / interval));
-            gals[1] = gals[1].slice(gals[0].length - Math.floor(60000 / interval));
-            gals[2] = gals[2].slice(gals[0].length - Math.floor(60000 / interval));
-
             var filterCoefficient = 0.9;
             var lowpassValue = 0;
             var highpassValue = 0;
@@ -592,7 +588,7 @@
                     gals[0][index] ** 2 + gals[1][index] ** 2 + gals[2][index] ** 2
                 );
             });
-            gal_tmp = gal_tmp.slice(gal_tmp.length - Math.floor(1000 / interval));
+            gal_tmp = gal_tmp.slice(gal_tmp.length - Math.floor(60000 / interval));
 
             for (i = 0; i < Math.floor(1000 / interval); i++) {
                 lowpassValue =
