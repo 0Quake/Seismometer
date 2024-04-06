@@ -483,11 +483,11 @@
         function init() {
             timerFunc();
             setInterval(function () {
-                if (buf.length > 0) requestAnimationFrame(timerFunc);
+                requestAnimationFrame(timerFunc);
             }, 100);
             setInterval(function () {
                 calcshindo()
-                if (permission_status == "granted" && buf.length == 0 && !nosensor_showed) {
+                if (permission_status == "granted" && gals[0].length == 0 && !nosensor_showed) {
                     nosensor_showed = true;
                     document.getElementById("nosensor").showModal();
                 }
@@ -563,7 +563,7 @@
 
         var gals = [[], [], []];
         function calcshindo() {
-            if (buf.length == 0) return
+            if (gals[0].length == 0) return
             var filterCoefficient = 0.9;
             var lowpassValue = 0;
             var highpassValue = 0;
