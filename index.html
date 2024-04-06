@@ -553,6 +553,9 @@
                 gals[0].push(ax);
                 gals[1].push(ay);
                 gals[2].push(az);
+                gals[0] = gals[0].slice(gals[0].length - Math.floor(60000 / interval));
+                gals[1] = gals[1].slice(gals[1].length - Math.floor(60000 / interval));
+                gals[2] = gals[2].slice(gals[2].length - Math.floor(60000 / interval));
             }
         }
 
@@ -586,12 +589,13 @@
             var maxPGA = 0;
             var maxPGD = 0;
 
-            gal = gals[0].map(function (elm, index) {
-                return Math.sqrt(
-                    gals[0][index] ** 2 + gals[1][index] ** 2 + gals[2][index] ** 2
-                );
-            });
-            var gal_tmp = gal.slice(gal.length - Math.floor(1000 / interval));
+            gal_tmp = [];
+            for (let i = 0; i < gals[0].length; i++) {
+                gal_tmp.push(Math.sqrt(
+                    gals[0][i] ** 2 + gals[1][i] ** 2 + gals[2][i] ** 2
+                ))
+            }
+
             for (i = 0; i < Math.floor(1000 / interval); i++) {
                 lowpassValue =
                     lowpassValue * filterCoefficient + gal_tmp[i] * (1 - filterCoefficient);
