@@ -546,13 +546,14 @@
             }
         }
 
-        var interval = 1;
+        var interval;
         var data = false;
         window.addEventListener("devicemotion", handleDeviceMotion);
         function handleDeviceMotion(event) {
-            if (!interval) document.getElementById("sampleRate").innerText = (1000 / event.interval).toFixed(2);
-            interval = event.interval;
-
+            if (!interval) {
+                document.getElementById("sampleRate").innerText = (1000 / event.interval).toFixed(2);
+                interval = event.interval;
+            }
             if (event.acceleration.x !== null) {
                 if (!data) {
                     document.getElementById("nodata").style.display = "none"
