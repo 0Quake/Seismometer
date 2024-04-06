@@ -573,30 +573,6 @@
                     document.getElementById("permissions").innerHTML = "権限：許可済み";
                     permission_status == "granted";
                 }
-
-                if (!detectInterval) {
-                    detectInterval = setTimeout(function () {
-                        interval2 = 1000 / (i * 10);
-                        if (interval / interval2 < 0.9 || interval / interval2 > 1.1) {
-                            interval = interval2
-                            document.getElementById("sampleRate").innerText = (1000 / interval).toFixed(2);
-                        }
-                    }, 100);
-                    setTimeout(function () {
-                        interval2 = 1000 / i;
-                        if (interval / interval2 < 0.9 || interval / interval2 > 1.1) {
-                            interval = interval2
-                            document.getElementById("sampleRate").innerText = (1000 / interval).toFixed(2);
-                        }
-                    }, 1000);
-                    setTimeout(function () {
-                        interval2 = 1000 / (i / 10);
-                        if (interval / interval2 < 0.9 || interval / interval2 > 1.1) {
-                            interval = interval2
-                            document.getElementById("sampleRate").innerText = (1000 / interval).toFixed(2);
-                        }
-                    }, 10000);
-                }
             }
         })
 
