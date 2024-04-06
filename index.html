@@ -454,33 +454,35 @@
             document.getElementById("splash").style.display = "none";
             init()
         })
+        document.getElementById("settingPermissions").addEventListener("click", function () {
+            if (DeviceMotionEvent.requestPermission) {
+                DeviceMotionEvent.requestPermission()
+                    .then(result => {
+                        permission_status = result
+                        if (permission_status == "granted") Str = "権限：許可済み";
+                        else if (permission_status == "denied") Str = "必要な権限が拒否されました。「モーションセンサー」の権限を付与してください。";
+                        else Str = "「モーションセンサー」の権限を付与してください。<button id='settingPermissions'>権限を設定</button>";
+                        document.getElementById("permissions").innerHTML = Str;
+                    })
+            }
+        })
         var permission_status = ""
         navigator.permissions.query({ name: "accelerometer" }).then((result) => {
             permission_status = result.state
             if (permission_status == "granted") Str = "権限：許可済み";
             else if (permission_status == "denied") Str = "必要な権限が拒否されました。「モーションセンサー」の権限を付与してください。";
-            else Str = "「モーションセンサー」の権限を付与してください。";
-            document.getElementById("permissions").innerText = Str;
+            else Str = "「モーションセンサー」の権限を付与してください。<button id='settingPermissions'>権限を設定</button>";
+            document.getElementById("permissions").innerHTML = Str;
 
             result.onchange = (result) => {
                 permission_status = result.currentTarget.state
                 if (permission_status == "granted") Str = "権限：許可済み";
                 else if (permission_status == "denied") Str = "必要な権限が拒否されました。「モーションセンサー」の権限を付与してください。";
-                else Str = "「モーションセンサー」の権限を付与してください。";
-                document.getElementById("permissions").innerText = Str;
+                else Str = "「モーションセンサー」の権限を付与してください。<button id='settingPermissions'>権限を設定</button>";
+                document.getElementById("permissions").innerHTML = Str;
             }
         })
 
-        if (DeviceMotionEvent.requestPermission) {
-            DeviceMotionEvent.requestPermission()
-                .then(result => {
-                    permission_status = result
-                    if (permission_status == "granted") Str = "権限：許可済み";
-                    else if (permission_status == "denied") Str = "必要な権限が拒否されました。「モーションセンサー」の権限を付与してください。";
-                    else Str = "「モーションセンサー」の権限を付与してください。";
-                    document.getElementById("permissions").innerText = Str;
-                })
-        }
 
         const dpr = window.devicePixelRatio || 1;
         const canvas = document.getElementById("canvas");
