@@ -630,9 +630,9 @@
             if (gals[0].length * interval > 60000)
                 document.getElementById("intCover").style.display = "none";
             fftGals = gals.map(function (gal) {
-                gal = gal.slice(Math.floor(gal.length - 60000 / interval));
                 return fft(arrayPadding(gal).map((r) => [r, 0]));
             });
+
             const dt = interval / 1000;
 
             const NF = fftGals[0].length;
