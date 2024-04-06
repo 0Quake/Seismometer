@@ -542,11 +542,14 @@
             interval = event.interval;
             document.getElementById("sampleRate").innerText = (1000 / interval).toFixed(2);
 
-            if (event.acceleration.x !== null) {
+            let t1 = event.acceleration.y;
+            let t2 = event.acceleration.x;
+            let t3 = event.acceleration.z;
+            if (t1 !== null) {
                 document.getElementById("nodata").style.display = "none"
-                ax = event.acceleration.y;
-                ay = event.acceleration.x;
-                az = event.acceleration.z;
+                ax = t1;
+                ay = t2;
+                az = t3;
 
                 gals[0].push(ax);
                 gals[1].push(ay);
@@ -583,13 +586,12 @@
             var maxPGA = 0;
             var maxPGD = 0;
 
-            var gal_tmp = gals[0].map(function (elm, index) {
+            gal = gals[0].map(function (elm, index) {
                 return Math.sqrt(
                     gals[0][index] ** 2 + gals[1][index] ** 2 + gals[2][index] ** 2
                 );
             });
-            gal_tmp = gal_tmp.slice(gal_tmp.length - Math.floor(60000 / interval));
-
+            var gal_tmp = gal.slice(gal.length - Math.floor(1000 / interval));
             for (i = 0; i < Math.floor(1000 / interval); i++) {
                 lowpassValue =
                     lowpassValue * filterCoefficient + gal_tmp[i] * (1 - filterCoefficient);
@@ -626,9 +628,9 @@
             if (gals[0].length * interval > 60000)
                 document.getElementById("intCover").style.display = "none";
             fftGals = gals.map(function (gal) {
+                gal = gal.slice(Math.floor(gal.length - 60000 / interval));
                 return fft(arrayPadding(gal).map((r) => [r, 0]));
             });
-
             const dt = interval / 1000;
 
             const NF = fftGals[0].length;
