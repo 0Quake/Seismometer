@@ -550,8 +550,7 @@
         var data = false;
         var i = 0;
         var detectInterval
-        window.addEventListener("devicemotion", handleDeviceMotion);
-        function handleDeviceMotion(event) {
+        window.addEventListener("devicemotion", function (event) {
             if (!interval) {
                 document.getElementById("sampleRate").innerText = (1000 / event.interval).toFixed(2);
                 interval = event.interval;
@@ -590,9 +589,16 @@
                             document.getElementById("sampleRate").innerText = (1000 / interval).toFixed(2);
                         }
                     }, 1000);
+                    setTimeout(function () {
+                        interval2 = 1000 / (i / 10);
+                        if (interval / interval2 < 0.9 || interval / interval2 > 1.1) {
+                            interval = interval2
+                            document.getElementById("sampleRate").innerText = (1000 / interval).toFixed(2);
+                        }
+                    }, 10000);
                 }
             }
-        }
+        })
 
         function timerFunc() {
             if (ax !== null) buf.push([ax, ay, az]);
