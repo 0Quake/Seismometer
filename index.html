@@ -566,6 +566,11 @@
                 gals[0].push(ax);
                 gals[1].push(ay);
                 gals[2].push(az);
+
+                if (permission_status !== "granted") {
+                    document.getElementById("permissions").innerHTML = "権限：許可済み";
+                    permission_status == "granted";
+                }
             }
         }
 
