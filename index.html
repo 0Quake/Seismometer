@@ -596,7 +596,7 @@
                     gals[0][index] ** 2 + gals[1][index] ** 2 + gals[2][index] ** 2
                 );
             });
-            var gal_tmp = gal.slice(gal.length - Math.floor(60000 / interval));
+            var gal_tmp = gal.slice(gal.length - Math.floor(1000 / interval));
             for (i = 0; i < Math.floor(1000 / interval); i++) {
                 lowpassValue =
                     lowpassValue * filterCoefficient + gal_tmp[i] * (1 - filterCoefficient);
