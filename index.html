@@ -557,7 +557,7 @@
         }
 
         function timerFunc() {
-            if (ax) buf.push([ax, ay, az]);
+            if (ax !== null) buf.push([ax, ay, az]);
             if (buf.length > maxN) {
                 buf.shift();
             } // delete index 0
