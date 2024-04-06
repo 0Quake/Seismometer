@@ -342,6 +342,14 @@
             padding: 20px 10px;
             text-align: center;
         }
+
+        .pga,
+        .maxpga,
+        .maxpgv,
+        .maxpgd,
+        .int_d {
+            font-family: ui-monospace;
+        }
     </style>
 </head>
 
@@ -542,14 +550,11 @@
             interval = event.interval;
             document.getElementById("sampleRate").innerText = (1000 / interval).toFixed(2);
 
-            let t1 = event.acceleration.y;
-            let t2 = event.acceleration.x;
-            let t3 = event.acceleration.z;
-            if (t1 !== null) {
+            if (event.acceleration.x !== null) {
                 document.getElementById("nodata").style.display = "none"
-                ax = t1;
-                ay = t2;
-                az = t3;
+                ax = event.acceleration.y;
+                ay = event.acceleration.x;
+                az = event.acceleration.z;
 
                 gals[0].push(ax);
                 gals[1].push(ay);
