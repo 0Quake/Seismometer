@@ -542,7 +542,7 @@
             interval = event.interval;
             document.getElementById("sampleRate").innerText = (1000 / interval).toFixed(2);
 
-            if (t1 !== null) {
+            if (event.acceleration.x !== null) {
                 document.getElementById("nodata").style.display = "none"
                 ax = event.acceleration.y;
                 ay = event.acceleration.x;
