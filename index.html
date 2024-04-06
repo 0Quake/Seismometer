@@ -450,35 +450,36 @@
         <small>&copy;2024 Benidate</small>
     </footer>
     <script>
+        var ax, ay, az;
         window.addEventListener("load", function () {
             document.getElementById("splash").style.display = "none";
             init()
         })
-        document.getElementById("settingPermissions").addEventListener("click", function () {
+        settingPermissions = function () {
             if (DeviceMotionEvent.requestPermission) {
                 DeviceMotionEvent.requestPermission()
                     .then(result => {
                         permission_status = result
                         if (permission_status == "granted") Str = "権限：許可済み";
                         else if (permission_status == "denied") Str = "必要な権限が拒否されました。「モーションセンサー」の権限を付与してください。";
-                        else Str = "「モーションセンサー」の権限を付与してください。<button id='settingPermissions'>権限を設定</button>";
+                        else Str = "「モーションセンサー」の権限を付与してください。<button onclick='settingPermissions'>権限を設定</button>";
                         document.getElementById("permissions").innerHTML = Str;
                     })
             }
-        })
+        }
         var permission_status = ""
         navigator.permissions.query({ name: "accelerometer" }).then((result) => {
             permission_status = result.state
             if (permission_status == "granted") Str = "権限：許可済み";
             else if (permission_status == "denied") Str = "必要な権限が拒否されました。「モーションセンサー」の権限を付与してください。";
-            else Str = "「モーションセンサー」の権限を付与してください。<button id='settingPermissions'>権限を設定</button>";
+            else Str = "「モーションセンサー」の権限を付与してください。<button onclick='settingPermissions'>権限を設定</button>";
             document.getElementById("permissions").innerHTML = Str;
 
             result.onchange = (result) => {
                 permission_status = result.currentTarget.state
                 if (permission_status == "granted") Str = "権限：許可済み";
                 else if (permission_status == "denied") Str = "必要な権限が拒否されました。「モーションセンサー」の権限を付与してください。";
-                else Str = "「モーションセンサー」の権限を付与してください。<button id='settingPermissions'>権限を設定</button>";
+                else Str = "「モーションセンサー」の権限を付与してください。<button onclick='settingPermissions'>権限を設定</button>";
                 document.getElementById("permissions").innerHTML = Str;
             }
         })
@@ -636,12 +637,15 @@
             )[1];
             document.getElementById("PGAPGVInt").innerText = estInt.toFixed(2);
 
+            gals[0] = gals[0].slice(Math.floor(gals[0].length - 60000 / interval));
+            gals[1] = gals[1].slice(Math.floor(gals[1].length - 60000 / interval));
+            gals[2] = gals[2].slice(Math.floor(gals[2].length - 60000 / interval));
+
             document.getElementById("progress").value =
                 (gals[0].length * interval) / 60000;
             if (gals[0].length * interval > 60000)
                 document.getElementById("intCover").style.display = "none";
             fftGals = gals.map(function (gal) {
-                gal = gal.slice(Math.floor(gal.length - 60000 / interval));
                 return fft(arrayPadding(gal).map((r) => [r, 0]));
             });
             const dt = interval / 1000;
