@@ -29,8 +29,58 @@
             });
         }
     </script>
-    
+
     <style>
+        #loading-wrap {
+            margin: 80px auto 0 auto;
+            text-align: center;
+            background-image: url(https://0quake.github.io/Seismometer/img/loading.png);
+            background-size: cover;
+            background-position: center;
+            width: 50px;
+            height: 50px;
+        }
+
+        #splash {
+            position: fixed;
+            inset: 0;
+            background: #202227;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100000005;
+        }
+
+        .button_wrap {
+            text-align: center;
+            margin: 10px 0 0 0;
+        }
+
+        button {
+            background: #333;
+            color: #fff;
+            border: solid 2px rgb(149, 46, 46);
+            padding: 0.5em 0.7em;
+            vertical-align: middle;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+        }
+
+        button:hover {
+            background-color: rgb(149, 46, 46);
+            color: #fff;
+        }
+
+        button:focus {
+            background-color: rgb(149, 46, 46);
+            color: #fff;
+            outline: solid 1px rgb(149, 46, 46);
+            outline-offset: 3px;
+        }
+
         header {
             text-align: center;
         }
@@ -65,14 +115,28 @@
             overflow-x: hidden;
         }
 
+        main {
+            position: relative;
+
+        }
+
+        #nodata {
+            position: absolute;
+            inset: 0;
+            background: rgba(125, 125, 125, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            backdrop-filter: blur(3px);
+            z-index: 100;
+        }
+
         #canvas {
             width: 100vw;
             height: 50vh;
         }
 
-        main {
-            padding: 10px;
-        }
 
         #progress {
             position: absolute;
@@ -112,7 +176,7 @@
             line-height: 1.5;
             min-width: 60vw;
             max-width: calc(100% - 20px);
-
+            padding: 10px;
         }
 
         #detail {
@@ -162,6 +226,8 @@
             justify-content: center;
             flex-wrap: wrap;
             max-width: calc(100% - 20px);
+            padding: 5px;
+            margin: 10px;
         }
 
         #pga_c,
@@ -211,12 +277,13 @@
             font-style: normal;
         }
 
-        #onepoint_d {
+        dialog {
             background: #222;
             outline: none;
             border: none;
             box-shadow: 3px 3px 5px #000;
             border-radius: 8px;
+            text-align: center;
         }
 
         dialog::backdrop {
@@ -279,12 +346,19 @@
 </head>
 
 <body>
+    <div id="splash">
+        <img src="https://0quake.github.io/Seismometer/img/logo.svg" width="256" height="256">
+        <div id="loading-wrap"></div>
+    </div>
+
     <header>
         <h1><img src="./img/logo.svg" alt="Zero Quakeのロゴ"><span>Zero Quake</span> <span>簡易地震計</span></h1>
     </header>
-    <canvas id="canvas"></canvas>
 
     <main>
+        <div id="nodata">データがありません</div>
+        <canvas id="canvas"></canvas>
+
         <div id="infoWrap">
             <div id="int_c" class="dataItem">
                 震度
@@ -295,38 +369,46 @@
                 </div>
             </div>
             <div id="pga_c" class="dataItem">
-                合成加速度 <div id="pga">0.00</div>gal
-                <div id="maxpga_wrap">秒間最大<div id="maxpga">0.00</div>gal</div>
+                合成加速度 <div id="pga"> - </div>gal
+                <div id="maxpga_wrap">秒間最大<div id="maxpga"> - </div>gal</div>
             </div>
             <div id="pgv_c" class="dataItem">
                 速度
-                <div id="maxpgv_wrap">秒間最大 <div id="maxpgv">0.00</div>cm/s</div>
+                <div id="maxpgv_wrap">秒間最大 <div id="maxpgv"> - </div>cm/s</div>
             </div>
             <div id="pgd_c" class="dataItem">
                 変位
-                <div id="maxpgd_wrap">秒間最大 <div id="maxpgd">0.00</div>cm</div>
-            </div>
-        </div>
-        <div id="detail_wrap">
-            <div id="detail">
-                <div>推定震度１ : <span id="PGAPGVInt">0.00</span> ±0.2</div>
-                <div>サンプリング周波数 : <span id="sampleRate">-</span>Hz</div>
-
-                <div><button id="onepoint">ワンポイントアドバイス</button></div>
-
-                <hr style="border-color:#999;margin:25px 0;">
-                <details>
-                    <summary style="color:#CCC;font-size:14px">参考文献など </summary>
-                    <ul>
-                        <li>藤本一雄・翠川三郎 (2005) : 近年の強震記録に基づく地震動強さ指標による計測震度推定法</li>
-                        <li>【ネット記事】<a href="https://qiita.com/soshi1822/items/6ae0c2d14a72478c79a0">加速度から計測震度を計算してみる</li>
-                        <li>【ネット記事】<a href="https://qiita.com/bellbind/items/ba7aa07f6c915d400000#7-javascript%E3%81%AB%E3%82%88%E3%82%8B%E3%83%AB%E3%83%BC%E3%83%97%E7%89%88fft%E5%AE%9F%E8%A3%85%E3%82%B3%E3%83%BC%E3%83%89">高速フーリエ変換FFTを理解する</a></li>
-                    </ul>
-                </details>
-                <div style="color:#CCC;font-size:14px">※気象庁検定を受けていない為、表示する値は全て震度相当値となります</div>
+                <div id="maxpgd_wrap">秒間最大 <div id="maxpgd"> - </div>cm</div>
             </div>
         </div>
     </main>
+
+    <div id="detail_wrap">
+        <div id="detail">
+            <div id="permissions">「モーションセンサー」の権限を付与してください。</div>
+            <div>推定震度１ : <span id="PGAPGVInt"> - </span> ±0.2</div>
+            <div>サンプリング周波数 : <span id="sampleRate">-</span>Hz</div>
+
+            <div><button id="onepoint">精度を上げる</button></div>
+
+            <hr style="border-color:#999;margin:25px 0;">
+            <details>
+                <summary style="color:#CCC;font-size:14px">参考文献など </summary>
+                <ul>
+                    <li>藤本一雄・翠川三郎 (2005) : 近年の強震記録に基づく地震動強さ指標による計測震度推定法</li>
+                    <li>【ネット記事】<a href="https://qiita.com/soshi1822/items/6ae0c2d14a72478c79a0">加速度から計測震度を計算してみる</a></li>
+                    <li>【ネット記事】<a href="https://qiita.com/bellbind/items/ba7aa07f6c915d400000#7-javascript%E3%81%AB%E3%82%88%E3%82%8B%E3%83%AB%E3%83%BC%E3%83%97%E7%89%88fft%E5%AE%9F%E8%A3%85%E3%82%B3%E3%83%BC%E3%83%89">高速フーリエ変換FFTを理解する</a></li>
+                </ul>
+            </details>
+            <div style="color:#CCC;font-size:14px">
+                <h4>ご注意</h4>
+                <ul>
+                    <li>気象庁検定を受けていない為、表示する震度は全て震度相当値となります。厳密には「震度計」</li>
+                    <li>観測値を公表する際は、あくまでその地点での参考値と明記したうえで公表してください。</li>
+                    <li>当サイトは無保証です。自己責任でご利用ください。</li>
+            </div>
+        </div>
+    </div>
 
     <dialog id="onepoint_d">
         <div id="infoWrap">
@@ -348,13 +430,39 @@
                 <div>安定した<br>水平面に置く</div>
             </div>
         </div>
-        <button id="onepoint_c">閉じる</button>
+        <div class="button_wrap"> <button id="onepoint_c">閉じる</button></div>
+    </dialog>
+    <dialog id="nosensor">
+        センサーが搭載されていない端末の可能性があります。お使いの端末を確認してください。
+        <div class="button_wrap"><button id="nosensor_c">閉じる</button></div>
     </dialog>
 
     <footer>
         <small>&copy;2024 Benidate</small>
     </footer>
     <script>
+        window.addEventListener("load", function () {
+            document.getElementById("splash").style.display = "none";
+            init()
+        })
+        var permission_status = ""
+        navigator.permissions.query({ name: "accelerometer" }).then((result) => {
+            permission_status = result.state
+            if (permission_status == "granted") Str = "権限：許可済み";
+            else if (permission_status == "denied") Str = "必要な権限が拒否されました。「モーションセンサー」の権限を付与してください。";
+            else Str = "「モーションセンサー」の権限を付与してください。";
+            document.getElementById("permissions").innerText = Str;
+
+            result.onchange = (result) => {
+                permission_status = result.currentTarget.state
+                if (permission_status == "granted") Str = "権限：許可済み";
+                else if (permission_status == "denied") Str = "必要な権限が拒否されました。「モーションセンサー」の権限を付与してください。";
+                else Str = "「モーションセンサー」の権限を付与してください。";
+                document.getElementById("permissions").innerText = Str;
+            }
+        })
+
+
         const dpr = window.devicePixelRatio || 1;
         const canvas = document.getElementById("canvas");
         const c = canvas.getContext("2d");
@@ -369,13 +477,20 @@
         const penColor = ["#cf4444", "#44cf49", "#4475cf"];
         const maxN = w;
 
-        window.addEventListener("load", init);
+        var nosensor_showed = false;
+
         function init() {
             timerFunc();
             setInterval(function () {
-                requestAnimationFrame(timerFunc);
+                if (buf.length > 0) requestAnimationFrame(timerFunc);
             }, 100);
-            setInterval(calcshindo, 1000);
+            setInterval(function () {
+                calcshindo()
+                if (permission_status == "granted" && buf.length == 0 && !nosensor_showed) {
+                    nosensor_showed = true;
+                    document.getElementById("nosensor").showModal();
+                }
+            }, 1000);
         }
 
         function redraw() {
@@ -414,11 +529,12 @@
         window.addEventListener("devicemotion", handleDeviceMotion);
         function handleDeviceMotion(event) {
             interval = event.interval;
-            document.getElementById("sampleRate").innerText = Math.floor(1000 / interval);
+            document.getElementById("sampleRate").innerText = (1000 / interval).toFixed(2);
             let t1 = event.acceleration.y;
             let t2 = event.acceleration.x;
             let t3 = event.acceleration.z;
             if (t1 !== null) {
+                document.getElementById("nodata").style.display = "none"
                 ax = t1;
                 ay = t2;
                 az = t3;
@@ -430,7 +546,7 @@
         }
 
         function timerFunc() {
-            buf.push([ax, ay, az]);
+            if (ax) buf.push([ax, ay, az]);
             if (buf.length > maxN) {
                 buf.shift();
             } // delete index 0
@@ -446,6 +562,7 @@
 
         var gals = [[], [], []];
         function calcshindo() {
+            if (buf.length == 0) return
             var filterCoefficient = 0.9;
             var lowpassValue = 0;
             var highpassValue = 0;
@@ -769,7 +886,9 @@
         document.getElementById("onepoint_c").addEventListener("click", function () {
             document.getElementById("onepoint_d").close();
         });
-
+        document.getElementById("nosensor_c").addEventListener("click", function () {
+            document.getElementById("nosensor").close();
+        });
         window.addEventListener("deviceorientation", handleOrientation, true);
         function handleOrientation(event) {
             if (event.absolute) {
