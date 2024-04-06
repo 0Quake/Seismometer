@@ -541,21 +541,16 @@
         function handleDeviceMotion(event) {
             interval = event.interval;
             document.getElementById("sampleRate").innerText = (1000 / interval).toFixed(2);
-            let t1 = event.acceleration.y;
-            let t2 = event.acceleration.x;
-            let t3 = event.acceleration.z;
+
             if (t1 !== null) {
                 document.getElementById("nodata").style.display = "none"
-                ax = t1;
-                ay = t2;
-                az = t3;
+                ax = event.acceleration.y;
+                ay = event.acceleration.x;
+                az = event.acceleration.z;
 
                 gals[0].push(ax);
                 gals[1].push(ay);
                 gals[2].push(az);
-                gals[0] = gals[0].slice(gals[0].length - Math.floor(60000 / interval));
-                gals[1] = gals[1].slice(gals[1].length - Math.floor(60000 / interval));
-                gals[2] = gals[2].slice(gals[2].length - Math.floor(60000 / interval));
             }
         }
 
@@ -563,7 +558,7 @@
             if (ax !== null) buf.push([ax, ay, az]);
             if (buf.length > maxN) {
                 buf.shift();
-            } // delete index 0
+            }
             redraw();
 
             //合成加速度
@@ -576,7 +571,11 @@
 
         var gals = [[], [], []];
         function calcshindo() {
-            if (gals[0].length == 0) return
+            if (gals[0].length == 0) return;
+            gals[0] = gals[0].slice(gals[0].length - Math.floor(60000 / interval));
+            gals[1] = gals[1].slice(gals[0].length - Math.floor(60000 / interval));
+            gals[2] = gals[2].slice(gals[0].length - Math.floor(60000 / interval));
+
             var filterCoefficient = 0.9;
             var lowpassValue = 0;
             var highpassValue = 0;
