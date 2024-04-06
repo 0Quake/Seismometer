@@ -635,16 +635,12 @@
                 2
             )[1];
             document.getElementById("PGAPGVInt").innerText = estInt.toFixed(2);
-
-            gals[0] = gals[0].slice(Math.floor(gals[0].length - 60000 / interval));
-            gals[1] = gals[1].slice(Math.floor(gals[1].length - 60000 / interval));
-            gals[2] = gals[2].slice(Math.floor(gals[2].length - 60000 / interval));
-
             document.getElementById("progress").value =
                 (gals[0].length * interval) / 60000;
             if (gals[0].length * interval > 60000)
                 document.getElementById("intCover").style.display = "none";
             fftGals = gals.map(function (gal) {
+                gal = gal.slice(Math.floor(gal.length - 60000 / interval));
                 return fft(arrayPadding(gal).map((r) => [r, 0]));
             });
             const dt = interval / 1000;
