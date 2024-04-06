@@ -571,7 +571,6 @@
 
         var gals = [[], [], []];
         function calcshindo() {
-            if (gals[0].length == 0) return;
             gals[0] = gals[0].slice(gals[0].length - Math.floor(60000 / interval));
             gals[1] = gals[1].slice(gals[0].length - Math.floor(60000 / interval));
             gals[2] = gals[2].slice(gals[0].length - Math.floor(60000 / interval));
