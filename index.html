@@ -462,7 +462,7 @@
                         permission_status = result
                         if (permission_status == "granted") Str = "権限：許可済み";
                         else if (permission_status == "denied") Str = "必要な権限が拒否されました。「モーションセンサー」の権限を付与してください。";
-                        else Str = "「モーションセンサー」の権限を付与してください。<button onclick='settingPermissions'>権限を設定</button>";
+                        else Str = "「モーションセンサー」の権限を付与してください。<button onclick='settingPermissions()'>権限を設定</button>";
                         document.getElementById("permissions").innerHTML = Str;
                     })
             }
@@ -472,14 +472,14 @@
             permission_status = result.state
             if (permission_status == "granted") Str = "権限：許可済み";
             else if (permission_status == "denied") Str = "必要な権限が拒否されました。「モーションセンサー」の権限を付与してください。";
-            else Str = "「モーションセンサー」の権限を付与してください。<button onclick='settingPermissions'>権限を設定</button>";
+            else Str = "「モーションセンサー」の権限を付与してください。<button onclick='settingPermissions()'>権限を設定</button>";
             document.getElementById("permissions").innerHTML = Str;
 
             result.onchange = (result) => {
                 permission_status = result.currentTarget.state
                 if (permission_status == "granted") Str = "権限：許可済み";
                 else if (permission_status == "denied") Str = "必要な権限が拒否されました。「モーションセンサー」の権限を付与してください。";
-                else Str = "「モーションセンサー」の権限を付与してください。<button onclick='settingPermissions'>権限を設定</button>";
+                else Str = "「モーションセンサー」の権限を付与してください。<button onclick='settingPermissions()'>権限を設定</button>";
                 document.getElementById("permissions").innerHTML = Str;
             }
         })
