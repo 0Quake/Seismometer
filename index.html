@@ -397,7 +397,10 @@
             <div>推定震度１ : <span id="PGAPGVInt"> - </span> ±0.2</div>
             <div>サンプリング周波数 : <span id="sampleRate">-</span>Hz</div>
 
-            <div><button id="onepoint">精度を上げる</button></div>
+            <div>
+                <button id="onepoint">精度を上げる</button>
+                <button id="ConnectSensor">外付けセンサー</button>
+            </div>
 
             <hr style="border-color:#999;margin:25px 0;">
             <details>
@@ -411,7 +414,7 @@
             <div style="color:#CCC;font-size:14px">
                 <div style="font-weight: bold;">ご注意</div>
                 <ul>
-                    <li>気象庁検定を受けていない為、表示する震度は全て震度相当値となります。よって、本プログラムは厳密には「震度計」ではありません。</li>
+                    <li>気象庁検定を受けていない為、表示する震度は全て震度相当値となります。厳密には「震度計」</li>
                     <li>観測値を公表する際は、あくまでその地点での参考値と明記したうえで公表してください。</li>
                     <li>気象庁の震度計と同じ計算方法を使用しています。計算には１分間の波形が必要であるため、起動後１分間は震度が表示されません。</li>
                     <li>当サイトは無保証です。自己責任でご利用ください。</li>
@@ -451,6 +454,99 @@
         <small>&copy;2024 Benidate</small>
     </footer>
     <script>
+        let port;
+        let reader;
+        let writer;
+        let connectionStatus = false;
+
+        document.getElementById("ConnectSensor").addEventListener("click", async function () {
+            //切断時にクリックされた場合
+            if (connectionStatus == false) {
+                try {
+                    port = await navigator.serial.requestPort();
+                    await port.open({ baudRate: 9600 });
+
+                    //errorになったらcatch (error)に飛ぶ
+                    connectionStatus = true;
+                    console.log("connected")
+                    document.getElementById('ConnectSensor').innerHTML = "外付けセンサー接続解除"
+
+                    reader = port.readable.getReader();
+
+                    //繋がっている最中の処理
+                    //物理的に突然抜いた時port.readableがfalseになる
+                    //ボタンを押してCloseした時はconnectionStatusがFalseにされる（切断処理は2回目のクリック側で行われる）
+                    while (connectionStatus && port.readable) {
+                        try {
+                            while (true) {
+                                const { value, done } = await reader.read();
+                                if (done) {
+                                    addSerial("Canceled\n");
+                                    break;
+                                }
+                                const inputValue = new TextDecoder().decode(value);
+                                addSerial(inputValue);
+                            }
+                        } catch (error) {
+                            addSerial("Error Read: " + error + "\n");
+                        }
+                    }
+                } catch (error) {
+                    addSerial("Error Open: " + error + "\n");
+                }
+            }
+
+            //接続時にクリックされた場合、もしくはconnectionStatus == trueの時に突然引き抜かれて上のループを抜けて流れてきた場合
+            if (connectionStatus == true) {
+                connectionStatus = false;
+
+                //readerのリリース(writerは都度リリースしている)
+                reader.cancel();//突然引き抜かれたケースではエラーになる
+                reader.releaseLock();
+                await port.close()
+                console.log("disconnected")
+                document.getElementById('ConnectSensor').innerHTML = "外付けセンサー接続"
+            }
+        })
+
+        //結果をmulti-inputに反映
+        var msgTmp = "";
+        function addSerial(msg) {
+            msgTmp += msg;
+            if (msg == "\n") {
+
+                acceleration = msgTmp.split(" ")
+                acceleration = { x: Number(acceleration[0]), y: Number(acceleration[1]), z: Number(acceleration[2]) }
+
+                if (interval != 100) {
+                    document.getElementById("sampleRate").innerText = 100;
+                    interval = 100;
+                }
+                if (acceleration.x !== null) {
+                    i++;
+                    if (!data) {
+                        document.getElementById("nodata").style.display = "none"
+                        data = true
+                    }
+                    ax = acceleration.y;
+                    ay = acceleration.x;
+                    az = acceleration.z;
+                    console.log(acceleration)
+
+                    gals[0].push(ax);
+                    gals[1].push(ay);
+                    gals[2].push(az);
+
+                    if (permission_status !== "granted") {
+                        document.getElementById("permissions").innerHTML = "外部センサー接続済み";
+                        permission_status == "granted";
+                    }
+                }
+
+                msgTmp = ""
+            }
+        }
+
         window.addEventListener("load", function () {
             document.getElementById("splash").style.display = "none";
             init()
@@ -552,7 +648,8 @@
         var i = 0;
         var detectInterval
         window.addEventListener("devicemotion", function (event) {
-            if (!interval) {
+            if (connectionStatus) return;
+            if (interval != event.interval) {
                 document.getElementById("sampleRate").innerText = (1000 / event.interval).toFixed(2);
                 interval = event.interval;
             }
