@@ -419,6 +419,7 @@
                     <li>気象庁の震度計と同じ計算方法を使用しています。計算には１分間の波形が必要であるため、起動後１分間は震度が表示されません。</li>
                     <li>当サイトは無保証です。自己責任でご利用ください。</li>
                     <li>Android OS + Chrome 以外の環境での動作は確認しておりません。この環境をおすすめします。</li>
+                    <li>[ingen084さんのseismometer](https://github.com/ingen084/seismometer)を書きこんだPiDAS, EQIS-1に対応しているはずです（自信無）　USB接続後、「外付けセンサー」ボタンから接続してください。</li>
             </div>
         </div>
     </div>
@@ -515,8 +516,9 @@
             msgTmp += msg;
             if (msg == "\n") {
 
-                acceleration = msgTmp.split(" ")
-                acceleration = { x: Number(acceleration[0]), y: Number(acceleration[1]), z: Number(acceleration[2]) }
+                Message = msgTmp.split(" ")
+                if(Message[0] !== "$XSACC") return;
+                acceleration = { x: Number(Message[1]), y: Number(Message[2]), z: Number(Message[3].split("*")[0]) }
 
                 if (interval != 100) {
                     document.getElementById("sampleRate").innerText = 100;
